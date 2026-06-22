@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ඉංග්‍රීසි ඉගෙන ගනිමු | Learn English</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1e40af;
+      --accent: #ea7317;
+      --bg: #eef4fb;
+      --surface: #ffffff;
+      --text: #1f2933;
+      --muted: #5b6573;
+      --border: #dbe4f0;
+      --correct: #15803d;
+      --correct-bg: #dcfce7;
+      --wrong: #b91c1c;
+      --wrong-bg: #fee2e2;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 28px 20px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(37, 99, 235, 0.25);
+    }
+    header h1 { margin: 0 0 4px; font-size: 1.6rem; }
+    header p { margin: 0; opacity: 0.9; font-size: 0.95rem; }
+
+    /* Progress bar */
+    .progress-wrap {
+      max-width: 640px;
+      margin: 24px auto 0;
+      padding: 0 16px;
+    }
+    .progress-track {
+      height: 8px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      background: var(--accent);
+      border-radius: 99px;
+      transition: width 0.4s ease;
+    }
+    .progress-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 6px;
+      text-align: right;
+    }
+
+    main { padding: 16px; }
+
+    .page {
+      display: none;
+      padding: 28px 24px;
+      max-width: 640px;
+      margin: 20px auto;
+      background: var(--surface);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(31, 41, 51, 0.08);
+      border: 1px solid var(--border);
+      animation: fade 0.35s ease;
+    }
+    .page.active { display: block; }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 { margin-top: 0; color: var(--primary-dark); font-size: 1.35rem; }
+    .subtitle { color: var(--muted); margin-top: -8px; }
+
+    /* Vocab cards */
+    .vocab-list {
+      list-style: none;
+      padding: 0;
+      margin: 20px 0;
+      display: grid;
+      gap: 12px;
+    }
+    .vocab-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--bg);
+      border-radius: 10px;
+      border-left: 4px solid var(--accent);
+    }
+    .vocab-en { font-weight: 700; color: var(--primary-dark); }
+    .vocab-si { color: var(--muted); text-align: right; }
+
+    /* Buttons */
+    button {
+      font-family: inherit;
+      font-size: 1rem;
+      padding: 12px 22px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: transform 0.15s ease, filter 0.15s ease;
+    }
+    button:hover { filter: brightness(1.08); }
+    button:active { transform: scale(0.97); }
+    button:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; }
+
+    .btn-primary { background: var(--primary); }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--primary);
+      border: 1px solid var(--border);
+    }
+
+    /* Quiz */
+    .quiz-question {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .options { display: grid; gap: 10px; }
+    .option {
+      width: 100%;
+      text-align: left;
+      background: var(--surface);
+      color: var(--text);
+      border: 2px solid var(--border);
+      font-weight: 500;
+    }
+    .option:hover { border-color: var(--primary); }
+    .option.correct { background: var(--correct-bg); border-color: var(--correct); color: var(--correct); }
+    .option.wrong   { background: var(--wrong-bg); border-color: var(--wrong); color: var(--wrong); }
+    .feedback {
+      margin-top: 16px;
+      font-weight: 600;
+      min-height: 24px;
+    }
+    .feedback.ok  { color: var(--correct); }
+    .feedback.no  { color: var(--wrong); }
+
+    /* Result */
+    .score-badge {
+      font-size: 2.4rem;
+      font-weight: 800;
+      color: var(--primary);
+      text-align: center;
+      margin: 12px 0;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      padding: 24px 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>ඉංග්‍රීසි ඉගෙන ගනිමු!</h1>
+    <p>Let&apos;s Learn English &mdash; මූලික පාඩම්</p>
+  </header>
+
+  <div class="progress-wrap" aria-hidden="false">
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-label" id="progressLabel">පියවර 1 / 4</div>
+  </div>
+
+  <main>
+    <!-- පිටුව 1: මුල් පිටුව -->
+    <section id="home" class="page active" aria-label="මුල් පිටුව / Home">
+      <h2>ආයුබෝවන්! &mdash; Welcome!</h2>
+      <p class="subtitle">මෙය මූලික ඉංග්‍රීසි භාෂාව ඉගෙන ගැනීමට සාදන ලද වෙබ් අඩවියකි.</p>
+      <p>මෙම පාඩමෙන් ඔබට මූලික ඉංග්‍රීසි වචන (basic words) සහ ආචාර කිරීම් (greetings) ඉගෙන ගත හැක.</p>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="showPage('lesson')">පාඩම 1 අරඹන්න &middot; Start Lesson</button>
+      </div>
+    </section>
+
+    <!-- පිටුව 2: පාඩම -->
+    <section id="lesson" class="page" aria-label="පාඩම 1 / Lesson 1">
+      <h2>පාඩම 1: මූලික වචන &mdash; Basic Words</h2>
+      <p class="subtitle">පහත වචන සහ ඒවායේ අර්ථ කියවන්න. Read each word and its meaning.</p>
+      <ul class="vocab-list">
+        <li><span class="vocab-en">Hello</span><span class="vocab-si">ආයුබෝවන්</span></li>
+        <li><span class="vocab-en">Thank you</span><span class="vocab-si">ඔබට ස්තූතියි</span></li>
+        <li><span class="vocab-en">Good morning</span><span class="vocab-si">සුභ උදෑසනක්</span></li>
+        <li><span class="vocab-en">Please</span><span class="vocab-si">කරුණාකර</span></li>
+        <li><span class="vocab-en">Sorry</span><span class="vocab-si">සමාවන්න</span></li>
+        <li><span class="vocab-en">Goodbye</span><span class="vocab-si">ආයුබෝවන් (සමුගැනීම)</span></li>
+      </ul>
+      <div class="btn-row">
+        <button class="btn-ghost" onclick="showPage('home')">&larr; ආපසු</button>
+        <button class="btn-primary" onclick="startQuiz()">පුහුණුවට යන්න &middot; Practice</button>
+      </div>
+    </section>
+
+    <!-- පිටුව 3: පුහුණුව -->
+    <section id="quiz" class="page" aria-label="පුහුණුව / Quiz">
+      <h2>පුහුණුව &mdash; Practice Quiz</h2>
+      <p class="subtitle" id="quizCounter">ප්‍රශ්නය 1 / 3</p>
+      <p class="quiz-question" id="quizQuestion"></p>
+      <div class="options" id="quizOptions"></div>
+      <p class="feedback" id="quizFeedback" role="status" aria-live="polite"></p>
+      <div class="btn-row">
+        <button class="btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>ඊළඟ ප්‍රශ්නය &middot; Next</button>
+      </div>
+    </section>
+
+    <!-- පිටුව 4: ප්‍රතිඵල -->
+    <section id="result" class="page" aria-label="ප්‍රතිඵල / Result">
+      <h2>අවසන්! &mdash; Well done!</h2>
+      <p class="subtitle">ඔබගේ ලකුණු &mdash; Your score:</p>
+      <div class="score-badge" id="scoreBadge">0 / 3</div>
+      <p id="resultMsg"></p>
+      <div class="btn-row">
+        <button class="btn-primary" onclick="startQuiz()">නැවත උත්සාහ කරන්න &middot; Try Again</button>
+        <button class="btn-ghost" onclick="showPage('home')">මුල් පිටුවට &middot; Home</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    &copy; ඉංග්‍රීසි ඉගෙනීමේ පාඩම් &middot; Learn English
+  </footer>
+
+  <script>
+    var steps = ['home', 'lesson', 'quiz', 'result'];
+
+    function updateProgress(pageId) {
+      var index = steps.indexOf(pageId);
+      var pct = ((index + 1) / steps.length) * 100;
+      document.getElementById('progressFill').style.width = pct + '%';
+      document.getElementById('progressLabel').textContent =
+        'පියවර ' + (index + 1) + ' / ' + steps.length;
+    }
+
+    function showPage(pageId) {
+      var pages = document.querySelectorAll('.page');
+      for (var i = 0; i < pages.length; i++) {
+        pages[i].classList.remove('active');
+      }
+      document.getElementById(pageId).classList.add('active');
+      updateProgress(pageId);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ---- Quiz logic ---- */
+    var questions = [
+      {
+        q: '"ස්තූතියි" යන්නට ඉංග්‍රීසියෙන් කියන්නේ කුමක්ද? (How do you say "thank you"?)',
+        options: ['Hello', 'Thank you', 'Sorry', 'Please'],
+        answer: 1
+      },
+      {
+        q: '"සුභ උදෑසනක්" යන්නෙහි ඉංග්‍රීසි අර්ථය කුමක්ද? (What does "සුභ උදෑසනක්" mean?)',
+        options: ['Goodbye', 'Good night', 'Good morning', 'Good evening'],
+        answer: 2
+      },
+      {
+        q: '"Please" යන වචනයේ සිංහල අර්ථය කුමක්ද? (Meaning of "Please"?)',
+        options: ['සමාවන්න', 'කරුණාකර', 'ස්තූතියි', 'ආයුබෝවන්'],
+        answer: 1
+      }
+    ];
+
+    var current = 0;
+    var score = 0;
+
+    function startQuiz() {
+      current = 0;
+      score = 0;
+      showPage('quiz');
+      renderQuestion();
+    }
+
+    function renderQuestion() {
+      var item = questions[current];
+      document.getElementById('quizCounter').textContent =
+        'ප්‍රශ්නය ' + (current + 1) + ' / ' + questions.length;
+      document.getElementById('quizQuestion').textContent = item.q;
+      document.getElementById('quizFeedback').textContent = '';
+      document.getElementById('quizFeedback').className = 'feedback';
+      document.getElementById('nextBtn').disabled = true;
+      document.getElementById('nextBtn').textContent =
+        current === questions.length - 1 ? 'ප්‍රතිඵල බලන්න · See Results' : 'ඊළඟ ප්‍රශ්නය · Next';
+
+      var box = document.getElementById('quizOptions');
+      box.innerHTML = '';
+      for (var i = 0; i < item.options.length; i++) {
+        (function (idx) {
+          var btn = document.createElement('button');
+          btn.className = 'option';
+          btn.type = 'button';
+          btn.textContent = item.options[idx];
+          btn.onclick = function () { checkAnswer(idx); };
+          box.appendChild(btn);
+        })(i);
+      }
+    }
+
+    function checkAnswer(selected) {
+      var item = questions[current];
+      var buttons = document.querySelectorAll('#quizOptions .option');
+      for (var i = 0; i < buttons.length; i++) {
+        buttons[i].disabled = true;
+        if (i === item.answer) buttons[i].classList.add('correct');
+      }
+      var feedback = document.getElementById('quizFeedback');
+      if (selected === item.answer) {
+        score++;
+        feedback.textContent = 'හරි! · Correct!';
+        feedback.className = 'feedback ok';
+      } else {
+        buttons[selected].classList.add('wrong');
+        feedback.textContent = 'වැරදියි. නිවැරදි පිළිතුර: ' + item.options[item.answer];
+        feedback.className = 'feedback no';
+      }
+      document.getElementById('nextBtn').disabled = false;
+    }
+
+    function nextQuestion() {
+      current++;
+      if (current < questions.length) {
+        renderQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      showPage('result');
+      document.getElementById('scoreBadge').textContent = score + ' / ' + questions.length;
+      var msg = document.getElementById('resultMsg');
+      if (score === questions.length) {
+        msg.textContent = 'විශිෂ්ටයි! සියලුම පිළිතුරු නිවැරදියි. (Perfect score!)';
+      } else if (score >= questions.length / 2) {
+        msg.textContent = 'හොඳයි! නැවත පුහුණු වී වැඩිදියුණු කරගන්න. (Good job, keep practicing!)';
+      } else {
+        msg.textContent = 'කලබල නොවන්න. පාඩම නැවත කියවා උත්සාහ කරන්න. (Don\'t worry, review the lesson and try again!)';
+      }
+    }
+
+    updateProgress('home');
+  </script>
+
+</body>
+</html>
